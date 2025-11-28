@@ -31,11 +31,16 @@ def checker(env):
         yield env.timeout(checkoutTime)
 
         eventLog.append((customer[0], customer[1], customer[2], customer[3], env.now))
+
 def checker(env):
     global totalServed
     while True:
         if waitingShoppers:
-            shopper = waitingShoppers
+            shopper = waitingShoppers.pop(0)
+            yield env.timeout(shopper.serviceTime)
+        else:
+            yield env.timeout(1)
+
 def customerArrival(env):
     customerNumber = 0
     while True:
@@ -57,6 +62,7 @@ def processResults():
     print("The average wait time was %.2f minutes." % avgWait)
     print("The total idle time was %d minutes" % idleTime)
     print("Total customers served:", totalServed)
+
 def main():
     numberCheckers = 1
 
@@ -69,7 +75,6 @@ def main():
     env.run(until=180 )
     print(len(waitingShoppers))
     processResults()
-
 
 
 if __name__ == '__main__':
